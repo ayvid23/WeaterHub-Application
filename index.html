@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Hub Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+    <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
+        <h1 class="text-2xl font-bold text-center mb-6 text-emerald-400">🌤️ Weather Hub</h1>
+        
+        <div class="flex gap-2 mb-6">
+            <input id="cityInput" type="text" placeholder="Enter city name..." class="flex-1 px-4 py-2 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-emerald-400 text-white">
+            <button id="searchBtn" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-semibold px-4 py-2 rounded-lg transition">Search</button>
+        </div>
+
+        <div id="weatherResult" class="text-center hidden">
+            <h2 id="cityName" class="text-3xl font-semibold mb-2">London, GB</h2>
+            <p id="description" class="text-slate-400 capitalize mb-4">scattered clouds</p>
+            <div class="text-5xl font-bold mb-6"><span id="temp">15</span>°C</div>
+            
+            <div class="grid grid-cols-2 gap-4 bg-slate-700/50 p-4 rounded-xl">
+                <div>
+                    <p class="text-xs text-slate-400">Humidity</p>
+                    <p id="humidity" class="text-lg font-medium">72%</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400">Wind Speed</p>
+                    <p id="wind" class="text-lg font-medium">4.1 m/s</p>
+                </div>
+            </div>
+        </div>
+        <p id="errorMsg" class="text-red-400 text-center hidden">City not found. Try again!</p>
+    </div>
+
+    <script>
+        const apiKey = 'b1b15e88fa797225412429c1c50c122a1'; // Demo public fallback key
+        document.getElementById('searchBtn').addEventListener('click', async () => {
+            const city = document.getElementById('cityInput').value;
+            if (!city) return;
+            
+            try {
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=895284fb2d2c50a520ea537456963d9c`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                
+                document.getElementById('cityName').innerText = `${data.name}, ${data.sys.country}`;
+                document.getElementById('description').innerText = data.weather[0].description;
+                document.getElementById('temp').innerText = Math.round(data.main.temp);
+                document.getElementById('humidity').innerText = `${data.main.humidity}%`;
+                document.getElementById('wind').innerText = `${data.wind.speed} m/s`;
+                
+                document.getElementById('weatherResult').classList.remove('hidden');
+                document.getElementById('errorMsg').classList.add('hidden');
+            } catch (err) {
+                document.getElementById('weatherResult').classList.add('hidden');
+                document.getElementById('errorMsg').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
